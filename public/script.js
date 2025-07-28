@@ -1,10 +1,13 @@
+const DOMPARSER = new DOMParser();
+
 const canvas = document.getElementById("drawingCanvas");
+const lineDrawingsContainer = document.querySelector(".line-drawings")
 const ctx = canvas.getContext("2d");
 
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
-let currentLine = []
+let currentLine = [];
 
 // Set initial canvas properties
 ctx.lineCap = "round";
@@ -14,10 +17,10 @@ ctx.lineWidth = 10;
 
 function startDrawing(e) {
   isDrawing = true;
-  currentLine = []
   const rect = canvas.getBoundingClientRect();
   lastX = e.clientX - rect.left;
   lastY = e.clientY - rect.top;
+  currentLine = [{ x: lastX, y: lastY }];
 }
 
 function drawToMouse(e) {
@@ -35,11 +38,9 @@ function drawToMouse(e) {
   ctx.stroke();
 
   currentLine.push({
-    x0: lastX,
-    y0: lastY,
-    x1: currentX,
-    y1: currentY
-  })
+    x: currentX,
+    y: currentY,
+  });
 
   lastX = currentX;
   lastY = currentY;
@@ -48,39 +49,70 @@ function drawToMouse(e) {
 function stopDrawing() {
   isDrawing = false;
   if (currentLine.length > 1) {
+    const hash = getHash(currentLine)
+    const svg = pointsToSVG(currentLine, canvas.width, canvas.height, ctx.lineWidth, 1/6);
     const measures = getMeasuresForLine(currentLine);
-    currentLine = []
-    const dataURL = canvas.toDataURL('image/png');
-    const img = document.createElement('img');
-    img.title = JSON.stringify(measures)
-    img.src = dataURL
-    img.classList.add("line-drawing")
-    document.body.appendChild(img)
-    console.log(img)
+    svg.title = JSON.stringify({...measures, hash});
+    svg.classList.add("line-drawing");
+    let bucket = lineDrawingsContainer.querySelector(`[data-hash="${hash}"]`)
+    if (!bucket) {
+      bucket = document.createElement("div")
+      bucket.class = "line-drawing-bucket"
+      bucket.dataset.hash = hash;
+      lineDrawingsContainer.appendChild(bucket)
+    }
+    bucket.appendChild(svg);
+    currentLine = [];
   }
-  clearCanvas()
+  clearCanvas();
 }
 
 function getMeasuresForLine(line) {
   let totalLength = 0;
-  for (const lineSection of line) {
-    const { x0, y0, x1, y1} = lineSection;
-    const x = x1 - x0;
-    const y = y1 - y0;
+  for (let i = 1; i < line.length; i++) {
+    const point = line[i];
+    const prevPoint = line[i - 1];
+    const x = prevPoint.x - point.x;
+    const y = prevPoint.y - point.y;
     const { sqrt, pow } = Math;
-    const length = sqrt(pow(x, 2) + pow(y, 2))
+    const length = sqrt(pow(x, 2) + pow(y, 2));
     totalLength += length;
   }
-  return {length: totalLength};
+  return { length: totalLength };
 }
 
-function hash(line) {
-  const measures = getMeasuresForLine(line)
-  return measures.length
+function getHash(line) {
+  const measures = getMeasuresForLine(line);
+  return Math.floor(measures.length / 80);
+}
+
+// Convert array of points to SVG polyline with auto-scaling
+function pointsToSVG(points, boundX, boundY, stroke, scale) {
+
+  width = boundX * scale;
+  height = boundY * scale;
+  strokeWidth = 10 * scale;
+  stroke = "#000";
+  fill = "none";
+
+  if (points.length === 0) {
+    return null;
+  }
+
+  // Convert scaled points to polyline points string
+  const pointsString = points.map((point) => `${point.x * scale},${point.y * scale}`)
+    .join(" ");
+
+  const svgString =
+    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="${pointsString}" stroke="${stroke}" stroke-width="${strokeWidth}" fill="${fill}"/>
+    </svg>`;
+  const svgDoc = DOMPARSER.parseFromString(svgString, "image/svg+xml");
+  return svgDoc.documentElement;
 }
 
 function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 // Mouse events

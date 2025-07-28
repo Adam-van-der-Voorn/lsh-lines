@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,25 +10,40 @@
             margin: 0;
             padding: 0;
         }
-        
+
         canvas {
             margin: 3px;
             border: 1px solid #000000;
             cursor: crosshair;
-        }    
+            grid-area: canvas;
+        }
 
         .line-drawing {
-            width: 50px;
-            aspect-ratio: 1;
-            border: 1px solid;
+            border: 3px solid #d890c0;
             margin: 3px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-areas:
+                "canvas result"
+                ".      result";
+            gap: 3px;
+            grid-template-columns: auto 1fr;
+        }
+
+        .line-drawings {
+            grid-area: result;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <canvas id="drawingCanvas" width="300" height="300"></canvas>
+        <div class="line-drawings"></div>
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
