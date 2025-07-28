@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "@std/path": "jsr:@std/path@^1.1.1"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["require-await"]
+    }
+  }
+}
