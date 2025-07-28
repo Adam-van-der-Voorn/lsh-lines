@@ -1,5 +1,7 @@
 const DOMPARSER = new DOMParser();
 
+/** @type {HTMLCanvasElement} */
+// @ts-ignore
 const canvas = document.getElementById("drawingCanvas");
 const lineDrawingsContainer = document.querySelector(".line-drawings")
 const ctx = canvas.getContext("2d");
@@ -54,11 +56,12 @@ function stopDrawing() {
     const measures = getMeasuresForLine(currentLine);
     svg.title = JSON.stringify({...measures, hash});
     svg.classList.add("line-drawing");
+    /** @type {HTMLElement} */
     let bucket = lineDrawingsContainer.querySelector(`[data-hash="${hash}"]`)
     if (!bucket) {
       bucket = document.createElement("div")
-      bucket.class = "line-drawing-bucket"
-      bucket.dataset.hash = hash;
+      bucket.classList.add("line-drawing-bucket")
+      bucket.dataset.hash = hash.toString();
       lineDrawingsContainer.appendChild(bucket)
     }
     bucket.appendChild(svg);
@@ -89,11 +92,9 @@ function getHash(line) {
 // Convert array of points to SVG polyline with auto-scaling
 function pointsToSVG(points, boundX, boundY, stroke, scale) {
 
-  width = boundX * scale;
-  height = boundY * scale;
-  strokeWidth = 10 * scale;
-  stroke = "#000";
-  fill = "none";
+  const width = boundX * scale;
+  const height = boundY * scale;
+  const strokeWidth = stroke * scale;
 
   if (points.length === 0) {
     return null;
@@ -105,7 +106,7 @@ function pointsToSVG(points, boundX, boundY, stroke, scale) {
 
   const svgString =
     `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <polyline points="${pointsString}" stroke="${stroke}" stroke-width="${strokeWidth}" fill="${fill}"/>
+      <polyline points="${pointsString}" stroke="#000" stroke-width="${strokeWidth}" fill="none"/>
     </svg>`;
   const svgDoc = DOMPARSER.parseFromString(svgString, "image/svg+xml");
   return svgDoc.documentElement;
