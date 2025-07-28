@@ -53,9 +53,8 @@ function stopDrawing() {
     const dataURL = canvas.toDataURL('image/png');
     const img = document.createElement('img');
     img.title = JSON.stringify(measures)
-    img.width = 200
-    img.height = 200
     img.src = dataURL
+    img.classList.add("line-drawing")
     document.body.appendChild(img)
     console.log(img)
   }
@@ -72,7 +71,12 @@ function getMeasuresForLine(line) {
     const length = sqrt(pow(x, 2) + pow(y, 2))
     totalLength += length;
   }
-  return {totalLength};
+  return {length: totalLength};
+}
+
+function hash(line) {
+  const measures = getMeasuresForLine(line)
+  return measures.length
 }
 
 function clearCanvas() {

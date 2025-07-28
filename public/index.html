@@ -7,18 +7,26 @@
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
         
         canvas {
+            margin: 3px;
             border: 1px solid #000000;
             cursor: crosshair;
         }    
+
+        .line-drawing {
+            width: 50px;
+            aspect-ratio: 1;
+            border: 1px solid;
+            margin: 3px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <canvas id="drawingCanvas" width="500" height="500"></canvas>
+        <canvas id="drawingCanvas" width="300" height="300"></canvas>
     </div>
     <script src="script.js"></script>
 </body>
