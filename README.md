@@ -10,6 +10,12 @@ A line grouping demo. Draw lines and they will be grouped by "similarity".
 and an "S" shape, that have the same total "straightness", but in
 different parts of the line, they should be dissimilar. 
 
+## Run
+
+serve the `public` dir, e.g.
+
+    npx http-server ./public
+
 
 
 
